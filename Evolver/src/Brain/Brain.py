@@ -64,12 +64,20 @@ class Brain(object):
     
     self.neurons = closedNeurons
   
+  "Returns an asexually produced child."
   def spawn(self):
     childSeed = self.seed.spawn()
     return Brain(childSeed, self.inputs, self.outputs)
   
+  "Returns a default brain with no evolved structure."
   def createEmpty(self):
     pass
   
-  def update(self):
+  "Runs until it is in sync with currentTime."
+  def updateTime(self, currentTime):
     pass
+
+
+"takes two brains and returns a child brain"
+def breed(a, b):
+  pass

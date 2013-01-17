@@ -20,21 +20,21 @@ class DivisionNode(object):
 
 class NeuronNode(DivisionNode):
   
-  def __init__(self, left, right, complete, synapse):
+  def __init__(self, left, right, complete, synapse, leftTransform, rightTransform):
     super(NeuronNode, self).__init__(left, right, complete)
-    self.leftTransform
-    self.rightTransform
+    self.leftTransform = leftTransform
+    self.rightTransform = rightTransform
     self.synapse = synapse
 
 
 class SynapseNode(DivisionNode):
   
-  def __init__(self, left, right, complete, sourceCarries, sinkCarries):
+  def __init__(self, left, right, complete, sourceCarries, sinkCarries, leftTransform, rightTransform):
     super(SynapseNode, self).__init__(left, right, complete)
     self.sourceCarries = sourceCarries
     self.sinkCarries = sinkCarries
-    self.leftTransform
-    self.rightTransform
+    self.leftTransform = leftTransform
+    self.rightTransform = rightTransform
 
 leafNeuronNode = NeuronNode(None, None, True, None)
 
