@@ -21,13 +21,16 @@ paramSize = numAttributes + numChemicals
 evolveRateSize = reduceSize(paramSize)
 "also used to access data"
 evolveRate = paramSize
+evolveRateEnd = evolveRate + evolveRateSize
 
 dataSize = paramSize + evolveRateSize
 fireTransformSize = transformSize(dataSize)
-evolveTransformSize = fireTransformSize
+evolveTransformSize = transformSize(dataSize)
 "used to access data only in finalize"
 fireTransform = dataSize
 evolveTransform = dataSize + fireTransformSize
+fireTransformEnd = fireTransform + fireTransformSize
+evolveTransformEnd = evolveTransform + evolveTransformSize
 
 divisionDataSize = dataSize + fireTransformSize + evolveTransformSize
 dataTransformSize = transformSize(divisionDataSize)
@@ -35,19 +38,33 @@ dataTransformSize = transformSize(divisionDataSize)
 class Synapse(object):
   
   def __init__(self, prev, nextNeuron, node):
-    '''structure'''
+    "structure"
     self.prev = prev
     self.next = nextNeuron
     
-    '''division data'''
+    "division data"
     self.node = node
     
-    '''dynamic behavior of main attributes'''
+    "dynamic behavior of main attributes"
     self.fireTransform = None
     self.evolveTransform = None
+    
+    "utilities"
+    self.accessDict = { \
+        'activation' : lambda : self.data[activation], \
+        'weight' : lambda : self.data[weight], \
+        'evolveRateScale' : lambda : self.data[evolveRateScale], \
+        'evolveRate' : lambda : self.data[evolveRate:evolveRateEnd] \
+        }
+    self.writeDict = { \
+        'activation' : self.writeValue(activation), \
+        'weight' : self.writeValue(weight), \
+        'evolveRateScale' : self.writeValue(evolveRateScale), \
+        'evolveRate' : self.writeVector(evolveRate, evolveRateSize) \
+        }
   
   def fire(self):
-    next.inBuffer += self.data[weight] * self.data[activation]
+    next.inBuffer += self.weight * self.activation
     self.data = applyTransform(self.data, self.fireTransform)
     self.updateRates()
     pass #schedule new evolve time
@@ -58,8 +75,8 @@ class Synapse(object):
     pass #schedule new evolve time
   
   def updateRates(self):
-    self.evolveRate = self.data[evolveRateScale] * \
-        sigmoid(applyTransform(self.data, self.data[evolveRate:evolveRate+evolveRateSize]))
+    self.evolveRate = self.evolveRateScale * \
+        sigmoid(applyTransform(self.data, self.evolveRate))
   
   def divide(self, chemicals):
     "apply left and right transforms to the data of left and right"
@@ -72,9 +89,9 @@ class Synapse(object):
   
   def finalize(self):
     self.fireTransform = \
-        rollTransform(self.data[fireTransform:fireTransform+fireTransformSize], dataSize)
+        rollTransform(self.data[fireTransform:fireTransformEnd], dataSize)
     self.evolveTransform = \
-        rollTransform(self.data[evolveTransform:evolveTransform+evolveTransformSize], dataSize)
+        rollTransform(self.data[evolveTransform:evolveTransformEnd], dataSize)
     self.data = self.data[:dataSize]
     self.data = None
 
