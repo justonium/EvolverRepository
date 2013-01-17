@@ -40,8 +40,6 @@ evolveTransformEnd = evolveTransform + evolveTransformSize
 divisionDataSize = dataSize + fireTransformSize + evolveTransformSize
 dataTransformSize = transformSize(divisionDataSize)
 
-""
-
 
 class Neuron(Divisible):
   
